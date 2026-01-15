@@ -23,8 +23,8 @@ public class CorsConfig {
         config.addAllowedOrigin("http://localhost"); // Para desarrollo (XAMPP)
         config.addAllowedOrigin("https://localhost"); // Para Aplicación móvil
         config.addAllowedOrigin("http://localhost:8080"); // Para API LOCAL
-        config.addAllowedOrigin("https://portal-web-henriquez-s-a-de-c-v-202.vercel.app/"); // Sistema web alojada en Vercel
-        config.addAllowedOrigin("https://henriquez-portal-web-2025-607cd9b319f2.herokuapp.com/"); // Donde se aloja la API HEROKU
+        config.addAllowedOrigin("https://portal-web-frontend-3393h2fz5-mc-henriquezs-projects.vercel.app/"); // Sistema web alojada en Vercel
+        config.addAllowedOrigin("https://portalwebhenriquez2025-feb6aad59691.herokuapp.com/"); // Donde se aloja la API HEROKU
 
         // Métodos  HTTP permitidos
         config.addAllowedMethod("GET");
@@ -68,8 +68,8 @@ public class CorsConfig {
         configuration.addAllowedOrigin("https://localhost"); // Apliacación Móvil
         configuration.addAllowedOrigin("http://localhost:8080"); // Para API LOCAL
         configuration.addAllowedOrigin("https://*.herokuapp.com");   // Dominio
-        configuration.addAllowedOrigin("https://portal-web-henriquez-s-a-de-c-v-202.vercel.app/"); // Sistema web en vercel
-        configuration.addAllowedOrigin("https://henriquez-portal-web-2025-607cd9b319f2.herokuapp.com/"); // Donde se aloja la API HEROKU
+        configuration.addAllowedOrigin("https://portal-web-frontend-3393h2fz5-mc-henriquezs-projects.vercel.app/"); // Sistema web en vercel
+        configuration.addAllowedOrigin("https://portalwebhenriquez2025-feb6aad59691.herokuapp.com/"); // Donde se aloja la API HEROKU
 
 
         configuration.addAllowedMethod("*");
