@@ -73,7 +73,7 @@ public class AuthenticationClienteController {
                             "Secure; " +
                             "SameSite=None; " +
                             "MaxAge=86400; "+
-                            "Domain=https://portalwebhenriquez2025-feb6aad59691.herokuapp.com",
+                            "Domain=https://portalwebhenriquez2025-feb6aad59691.herokuapp.com/",
                     token
             );
 

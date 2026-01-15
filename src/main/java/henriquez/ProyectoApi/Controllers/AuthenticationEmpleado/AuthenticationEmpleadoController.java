@@ -72,7 +72,7 @@ public class AuthenticationEmpleadoController {
                             "Secure; " +
                             "SameSite=None; " +
                             "MaxAge=86400; "+
-                            "Domain=https://portalwebhenriquez2025-feb6aad59691.herokuapp.com",
+                            "Domain=https://portalwebhenriquez2025-feb6aad59691.herokuapp.com/",
                     token
             );
 
@@ -148,7 +148,7 @@ public class AuthenticationEmpleadoController {
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
         // Crear cookie de expiración con SameSite=None
-        String cookieValue = "authToken=; Path=/; HttpOnly; Secure; SameSite=None; MaxAge=0; Domain=https://portalwebhenriquez2025-feb6aad59691.herokuapp.com";
+        String cookieValue = "authToken=; Path=/; HttpOnly; Secure; SameSite=None; MaxAge=0; Domain=https://portalwebhenriquez2025-feb6aad59691.herokuapp.com/";
 
         response.addHeader("Set-Cookie", cookieValue);
         response.addHeader("Access-Control-Expose-Headers", "Set-Cookie");
