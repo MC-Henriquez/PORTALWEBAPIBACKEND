@@ -28,20 +28,40 @@ public class CloudinaryController { // <-- Renombrada y simple
     }
 
     @PostMapping("/subirImagen")
-    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file) {
-        try {
-            String folderName = "general";
-            String imageUrl = cloudinaryService.uploadImage(file, folderName);
+public ResponseEntity<?> uploadImage(
+        @RequestParam(value = "image", required = false) MultipartFile file,
+        @RequestParam(defaultValue = "general") String folder) {
+
+    try {
+        // Caso SIN imagen (permitido)
+        if (file == null || file.isEmpty()) {
             return ResponseEntity.ok(Map.of(
-                    "message:", "Imagen subida exitosamente",
-                    "url", imageUrl));
-
-        } catch (IOException e) {
-            //  Regresa un Codigo 500 Internal Server Error
-            return ResponseEntity.internalServerError().body("Error al subir la imagen " + e.getMessage());
-
+                    "message", "Empleado registrado sin imagen",
+                    "url", null
+            ));
         }
+
+        // Validación básica
+        if (!file.getContentType().startsWith("image/")) {
+            return ResponseEntity.badRequest().body(
+                    Map.of("error", "El archivo no es una imagen válida")
+            );
+        }
+
+        String imageUrl = cloudinaryService.uploadImage(file, folder);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Imagen subida exitosamente",
+                "url", imageUrl
+        ));
+
+    } catch (IOException e) {
+        logger.error("Error Cloudinary", e);
+        return ResponseEntity.internalServerError().body(
+                Map.of("error", "No se pudo subir la imagen")
+        );
     }
+}
 
     @PostMapping("SubirImagenCarpeta")
     public ResponseEntity<?> uploadImageToFolder(@RequestParam("image") MultipartFile file, @RequestParam String folder) {
