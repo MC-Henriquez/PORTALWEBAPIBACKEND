@@ -22,7 +22,7 @@ public class CuentasController {
     // 1️⃣ ESTADO DE CUENTA (DOCUMENTOS POR PERIODO)
     // ==========================================================
     @GetMapping("/estado-cuenta/{idCliente}")
-    public ResponseEntity<EstadoCuentaResponseDTO> obtenerEstadoCuenta(
+    public ResponseEntity<Cuentas> obtenerEstadoCuenta(
             @PathVariable String idCliente,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
@@ -31,8 +31,8 @@ public class CuentasController {
             return ResponseEntity.badRequest().build();
         }
 
-        EstadoCuenta response =
-                service.obtenerEstadoCuenta(idCliente, fechaInicio, fechaFin);
+        Cuentas response =
+                service.Cuentas(idCliente, fechaInicio, fechaFin);
 
         if (response.getDocuments().isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -45,11 +45,11 @@ public class CuentasController {
     // 2️⃣ TOTALES CONSOLIDADOS
     // ==========================================================
     @GetMapping("/totales/{idCliente}")
-    public ResponseEntity<TotalConsolidadoDTO> obtenerTotales(
+    public ResponseEntity<Total> obtenerTotales(
             @PathVariable String idCliente) {
 
         return ResponseEntity.ok(
-                service.obtenerTotalesConsolidados(idCliente)
+                service.Total(idCliente)
         );
     }
 
@@ -57,10 +57,10 @@ public class CuentasController {
     // 3️⃣ RANGO HISTÓRICO (AÑOS DISPONIBLES)
     // ==========================================================
     @GetMapping("/rango-historico")
-    public ResponseEntity<RangoHistoricoDTO> obtenerRangoHistorico(
+    public ResponseEntity<Rango> obtenerRangoHistorico(
             @RequestParam String clienteId) {
 
-        RangoHistoricoDTO rango = service.obtenerRangoHistorico(clienteId);
+        Rango rango = service.Rango(clienteId);
 
         if (rango == null) {
             return ResponseEntity.noContent().build();
@@ -73,10 +73,10 @@ public class CuentasController {
     // 4️⃣ INFO DEL CLIENTE
     // ==========================================================
     @GetMapping("/cliente-info/{idCliente}")
-    public ResponseEntity<ClienteInfoDTO> obtenerClienteInfo(
+    public ResponseEntity<Cliente> obtenerClienteInfo(
             @PathVariable String idCliente) {
 
-        ClienteInfoDTO info = service.obtenerClienteInfo(idCliente);
+        Cliente info = service.Cliente(idCliente);
 
         if (info == null) {
             return ResponseEntity.noContent().build();
@@ -89,7 +89,7 @@ public class CuentasController {
     // 5️⃣ TOP FACTURAS RECIENTES
     // ==========================================================
     @GetMapping("/detallesDeFactura/{idCliente}")
-    public ResponseEntity<List<CuentaDTO>> obtenerDetalle(
+    public ResponseEntity<List<Cuentas>> obtenerDetalle(
             @PathVariable String idCliente) {
 
         return ResponseEntity.ok(
