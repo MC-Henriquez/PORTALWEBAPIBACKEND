@@ -1,5 +1,6 @@
-package henriquez.ProyectoApi.Controllers.CuentasController;
+package henriquez.ProyectoApi.Controllers.Cuentas;
 
+import henriquez.ProyectoApi.Entities.Cuentas.CuentasEntity;
 import henriquez.ProyectoApi.Models.*;
 import henriquez.ProyectoApi.Services.Cuentas.CuentasService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,34 @@ public class CuentasController {
     private CuentasService service;
 
     // ==========================================================
-    // 1️⃣ ESTADO DE CUENTA (DOCUMENTOS POR PERIODO)
+    // 1. MOSTRAR TODAS LAS CUENTAS
+    // ==========================================================
+    @GetMapping("/MostrarCuenta")
+    public List<CuentasDTO> getallCuentas() {
+        return service.MostrarCuenta();
+    }
+
+    // ==========================================================
+    // 2. CUENTAS POR CLIENTE (SIN USAR REPOSITORY DIRECTO)
+    // ==========================================================
+    @GetMapping("/CuentasPorClienteId/{idCliente}")
+    public ResponseEntity<List<CuentasEntity>> obtenerPorCliente(
+            @PathVariable String idCliente) {
+
+        List<CuentasEntity> lista = service.obtenerPorCliente(idCliente);
+
+        if (lista.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(lista);
+    }
+
+    // ==========================================================
+    // 3. ESTADO DE CUENTA POR RANGO DE FECHAS
     // ==========================================================
     @GetMapping("/estado-cuenta/{idCliente}")
-    public ResponseEntity<Cuentas> obtenerEstadoCuenta(
+    public ResponseEntity<List<EstadoCuentaDetalleDTO>> getDetalleEstadoCuenta(
             @PathVariable String idCliente,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
@@ -31,36 +56,24 @@ public class CuentasController {
             return ResponseEntity.badRequest().build();
         }
 
-        Cuentas response =
-                service.Cuentas(idCliente, fechaInicio, fechaFin);
+        List<EstadoCuentaDetalleDTO> detalle =
+                service.obtenerDetalleTransacciones(idCliente, fechaInicio, fechaFin);
 
-        if (response.getDocuments().isEmpty()) {
+        if (detalle.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(detalle);
     }
 
     // ==========================================================
-    // 2️⃣ TOTALES CONSOLIDADOS
-    // ==========================================================
-    @GetMapping("/totales/{idCliente}")
-    public ResponseEntity<Total> obtenerTotales(
-            @PathVariable String idCliente) {
-
-        return ResponseEntity.ok(
-                service.Total(idCliente)
-        );
-    }
-
-    // ==========================================================
-    // 3️⃣ RANGO HISTÓRICO (AÑOS DISPONIBLES)
+    // 4. RANGO HISTÓRICO
     // ==========================================================
     @GetMapping("/rango-historico")
-    public ResponseEntity<Rango> obtenerRangoHistorico(
+    public ResponseEntity<RangoHistoricoDTO> getRangoHistorico(
             @RequestParam String clienteId) {
 
-        Rango rango = service.Rango(clienteId);
+        RangoHistoricoDTO rango = service.obtenerRangoHistorico(clienteId);
 
         if (rango == null) {
             return ResponseEntity.noContent().build();
@@ -70,30 +83,23 @@ public class CuentasController {
     }
 
     // ==========================================================
-    // 4️⃣ INFO DEL CLIENTE
+    // 5. TOTALES CONSOLIDADOS
     // ==========================================================
-    @GetMapping("/cliente-info/{idCliente}")
-    public ResponseEntity<Cliente> obtenerClienteInfo(
+    @GetMapping("/totales/{idCliente}")
+    public TotalConsolidadoDTO obtenerTotalesConsolidados(
             @PathVariable String idCliente) {
 
-        Cliente info = service.Cliente(idCliente);
-
-        if (info == null) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok(info);
+        return service.obtenerTotalesConsolidados(idCliente);
     }
 
     // ==========================================================
-    // 5️⃣ TOP FACTURAS RECIENTES
+    // 6. TOP 5 FACTURAS
     // ==========================================================
     @GetMapping("/detallesDeFactura/{idCliente}")
-    public ResponseEntity<List<Cuentas>> obtenerDetalle(
+    public ResponseEntity<List<CuentaDTO>> obtenerDetalle(
             @PathVariable String idCliente) {
 
-        return ResponseEntity.ok(
-                service.obtenerTop5PorCliente(idCliente)
-        );
+        return ResponseEntity.ok(service.obtenerTop5PorCliente(idCliente));
     }
 }
+
