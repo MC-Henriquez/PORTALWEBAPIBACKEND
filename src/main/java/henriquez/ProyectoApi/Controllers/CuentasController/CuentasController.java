@@ -101,8 +101,8 @@ public class CuentasController {
     // RUTA: GET /api/cuentas/totales/{idCliente}
     // -------------------------------------------------------------------------------------
     @GetMapping("/totales/{idCliente}")
-    public TotalConsolidadoDTO obtenerTotalesConsolidados(@PathVariable String idCliente) {
-        return service.obtenerTotalesConsolidados(idCliente);
+    public monto obtenerTotalesConsolidados(@PathVariable String idCliente) {
+        return service.monto(idCliente);
     }
 
     @GetMapping("/detallesDeFactura/{idCliente}")
