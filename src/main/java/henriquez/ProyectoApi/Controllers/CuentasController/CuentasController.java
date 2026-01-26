@@ -31,7 +31,7 @@ public class CuentasController {
             return ResponseEntity.badRequest().build();
         }
 
-        EstadoCuentaResponseDTO response =
+        EstadoCuenta response =
                 service.obtenerEstadoCuenta(idCliente, fechaInicio, fechaFin);
 
         if (response.getDocuments().isEmpty()) {
