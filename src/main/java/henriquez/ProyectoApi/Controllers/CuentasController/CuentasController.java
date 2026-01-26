@@ -1,7 +1,9 @@
-package henriquez.ProyectoApi.Controllers.Cuentas;
+package henriquez.ProyectoApi.Controllers.CuentasController;
+
 
 import henriquez.ProyectoApi.Entities.Cuentas.CuentasEntity;
 import henriquez.ProyectoApi.Models.*;
+import henriquez.ProyectoApi.Repositories.Cuentas.CuentasRepository;
 import henriquez.ProyectoApi.Services.Cuentas.CuentasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,27 +16,28 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/cuentas")
 @CrossOrigin
+
 public class CuentasController {
 
     @Autowired
     private CuentasService service;
 
-    // ==========================================================
-    // 1. MOSTRAR TODAS LAS CUENTAS
-    // ==========================================================
+    @Autowired
+    private CuentasRepository cuentasRepository;
+
+
+    // --- 1. LEER (READ) ---
     @GetMapping("/MostrarCuenta")
     public List<CuentasDTO> getallCuentas() {
         return service.MostrarCuenta();
     }
 
-    // ==========================================================
-    // 2. CUENTAS POR CLIENTE (SIN USAR REPOSITORY DIRECTO)
-    // ==========================================================
+    // ===========================================================
+    // 1. Obtener todas las cuentas por ID de cliente
+    // ===========================================================
     @GetMapping("/CuentasPorClienteId/{idCliente}")
-    public ResponseEntity<List<CuentasEntity>> obtenerPorCliente(
-            @PathVariable String idCliente) {
-
-        List<CuentasEntity> lista = service.obtenerPorCliente(idCliente);
+    public ResponseEntity<List<CuentasEntity>> obtenerPorCliente(@PathVariable String idCliente) {
+        List<CuentasEntity> lista = cuentasRepository.findByCliente(idCliente);
 
         if (lista.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -43,21 +46,30 @@ public class CuentasController {
         return ResponseEntity.ok(lista);
     }
 
-    // ==========================================================
-    // 3. ESTADO DE CUENTA POR RANGO DE FECHAS
-    // ==========================================================
+
+    // -------------------------------------------------------------------------------------
+    // ENDPOINT 2: Filtrado y Detalle de Transacciones (Movimientos)
+    // RUTA: GET /api/cuentas/estado-cuenta/{idCliente}?fechaInicio=YYYY-MM-DD&fechaFin=YYYY-MM-DD
+    // -------------------------------------------------------------------------------------
+
     @GetMapping("/estado-cuenta/{idCliente}")
     public ResponseEntity<List<EstadoCuentaDetalleDTO>> getDetalleEstadoCuenta(
             @PathVariable String idCliente,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
 
+        // Validación básica (se puede mejorar)
         if (fechaInicio.isAfter(fechaFin)) {
-            return ResponseEntity.badRequest().build();
+            // Devuelve un error 400 Bad Request si el rango de fechas es inválido
+            return ResponseEntity.badRequest().body(null);
         }
 
-        List<EstadoCuentaDetalleDTO> detalle =
-                service.obtenerDetalleTransacciones(idCliente, fechaInicio, fechaFin);
+        // Llamar al servicio para obtener los datos filtrados y calculados
+        List<EstadoCuentaDetalleDTO> detalle = service.obtenerDetalleTransacciones(
+                idCliente,
+                fechaInicio,
+                fechaFin
+        );
 
         if (detalle.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -66,9 +78,10 @@ public class CuentasController {
         return ResponseEntity.ok(detalle);
     }
 
-    // ==========================================================
-    // 4. RANGO HISTÓRICO
-    // ==========================================================
+    // -------------------------------------------------------------------------------------
+    // ENDPOINT 3: Rango Historico
+    // RUTA: GET /api/cuentas/rango-historico?clienteId={idCliente}
+    // -------------------------------------------------------------------------------------
     @GetMapping("/rango-historico")
     public ResponseEntity<RangoHistoricoDTO> getRangoHistorico(
             @RequestParam String clienteId) {
@@ -76,30 +89,24 @@ public class CuentasController {
         RangoHistoricoDTO rango = service.obtenerRangoHistorico(clienteId);
 
         if (rango == null) {
+            // Podrías devolver 204 si el cliente existe pero no tiene transacciones
             return ResponseEntity.noContent().build();
         }
 
         return ResponseEntity.ok(rango);
     }
 
-    // ==========================================================
-    // 5. TOTALES CONSOLIDADOS
-    // ==========================================================
+    // -------------------------------------------------------------------------------------
+    // ENDPOINT 4: Totales Consolidados (Resumen Histórico)
+    // RUTA: GET /api/cuentas/totales/{idCliente}
+    // -------------------------------------------------------------------------------------
     @GetMapping("/totales/{idCliente}")
-    public TotalConsolidadoDTO obtenerTotalesConsolidados(
-            @PathVariable String idCliente) {
-
+    public TotalConsolidadoDTO obtenerTotalesConsolidados(@PathVariable String idCliente) {
         return service.obtenerTotalesConsolidados(idCliente);
     }
 
-    // ==========================================================
-    // 6. TOP 5 FACTURAS
-    // ==========================================================
     @GetMapping("/detallesDeFactura/{idCliente}")
-    public ResponseEntity<List<CuentaDTO>> obtenerDetalle(
-            @PathVariable String idCliente) {
-
+    public ResponseEntity<List<CuentaDTO>> obtenerDetalle(@PathVariable String idCliente) {
         return ResponseEntity.ok(service.obtenerTop5PorCliente(idCliente));
     }
 }
-
