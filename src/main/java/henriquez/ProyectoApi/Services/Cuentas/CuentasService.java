@@ -15,6 +15,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+public List<CuentasEntity> obtenerPorCliente(String idCliente) {
+    return cuentasRepository.findByCliente(idCliente);
+}
+
+
 @Service
 public class CuentasService {
 
